@@ -14,4 +14,8 @@ export class AppController {
   newendponit() {
     return 'soy nuevo';
   }
+  @Get('/ruta/')
+  hello() {
+    return 'con /sas/';
+  }
 }
