@@ -7,9 +7,11 @@ import {
   Body,
   Put,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 
 import { ProductsService } from '../services/products.service';
+import { CreateProductDto, UpdateProductDto } from '../dtos/products.dtos';
 
 @Controller('products')
 export class ProductsController {
@@ -32,21 +34,21 @@ export class ProductsController {
   }
 
   @Get(':productId')
-  getProduct(@Param('productId') productId: string) {
+  getProduct(@Param('productId', ParseIntPipe) productId: number) {
     // return {
     //   message: `product ${productId}`,
     // };
-    return this.productsService.findOne(+productId);
+    return this.productsService.findOne(productId);
   }
 
   @Post()
-  create(@Body() payload: any) {
+  create(@Body() payload: CreateProductDto) {
     // return { message: 'entrar nuevo producto', payload };
     return this.productsService.create(payload);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() payload: any) {
+  update(@Param('id') id: string, @Body() payload: UpdateProductDto) {
     // return {
     //   id,
     //   payload,
