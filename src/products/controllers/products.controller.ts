@@ -1,25 +1,36 @@
 import {
   Controller,
-  //Query,
   Get,
+  Query,
   Param,
   Post,
   Body,
   Put,
   Delete,
-  ParseIntPipe,
+  HttpStatus,
+  HttpCode,
+  Res,
+  // ParseIntPipe,
 } from '@nestjs/common';
+import { Response } from 'express';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
-import { ProductsService } from '../services/products.service';
+import { ParseIntPipe } from '../../common/parse-int.pipe';
 import { CreateProductDto, UpdateProductDto } from '../dtos/products.dtos';
+import { ProductsService } from './../services/products.service';
 
+@ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
-  @Get('')
-  getProducts() {
-    // @Query('brand') brand: string, // @Query('offset') offset = 0, // @Query('limit') limit = 100,
+  @Get()
+  @ApiOperation({ summary: 'List of products' })
+  getProducts(
+    @Query('limit') limit = 100,
+    @Query('offset') offset = 0,
+    @Query('brand') brand: string,
+  ) {
     // return {
     //   message: `products limit=> ${limit} offset=> ${offset} brand=> ${brand}`,
     // };
@@ -28,32 +39,30 @@ export class ProductsController {
 
   @Get('filter')
   getProductFilter() {
-    return {
-      message: `yo soy un filter`,
-    };
+    return `yo soy un filter`;
   }
 
   @Get(':productId')
-  getProduct(@Param('productId', ParseIntPipe) productId: number) {
-    // return {
+  @HttpCode(HttpStatus.ACCEPTED)
+  getOne(@Param('productId', ParseIntPipe) productId: number) {
+    // response.status(200).send({
     //   message: `product ${productId}`,
-    // };
+    // });
     return this.productsService.findOne(productId);
   }
 
   @Post()
   create(@Body() payload: CreateProductDto) {
-    // return { message: 'entrar nuevo producto', payload };
+    // return {
+    //   message: 'accion de crear',
+    //   payload,
+    // };
     return this.productsService.create(payload);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() payload: UpdateProductDto) {
-    // return {
-    //   id,
-    //   payload,
-    // };
-    return this.productsService.upDate(+id, payload);
+    return this.productsService.update(+id, payload);
   }
 
   @Delete(':id')
