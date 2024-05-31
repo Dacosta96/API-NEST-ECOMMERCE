@@ -1,4 +1,6 @@
-import { Module, HttpModule, HttpService } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { HttpModule, HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
@@ -17,7 +19,7 @@ import config from './config';
       load: [config],
       isGlobal: true,
       validationSchema: Joi.object({
-        API_KEY: Joi.number().required(),
+        API_KEY: Joi.number(),
         DATABASE_NAME: Joi.string().required(),
         DATABASE_PORT: Joi.number().required(),
       }),
@@ -33,9 +35,8 @@ import config from './config';
     {
       provide: 'TASKS',
       useFactory: async (http: HttpService) => {
-        const tasks = await http
-          .get('https://jsonplaceholder.typicode.com/todos')
-          .toPromise();
+        const request = http.get('https://jsonplaceholder.typicode.com/todos');
+        const tasks = await lastValueFrom(request);
         return tasks.data;
       },
       inject: [HttpService],
